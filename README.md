@@ -3,8 +3,8 @@ __OVERVIEW__
 
 | Project         | IProcess    
 |:----------------|:--------------------------------------------------
-| Homepage        | https://github.com/pry/pry
-| Documentation   | http://rubydoc.info/pry-developer\_tools/wikiiprocess/ 
+| Homepage        | https://github.com/pry/pry-developer_tools
+| Documentation   | http://github.com/pry/pry-developer_tools/
 | Author          | Pry Team             
 
 
