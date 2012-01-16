@@ -1,7 +1,7 @@
 __OVERVIEW__
 
 
-| Project         | IProcess    
+| Project         | pry-developer\_tools    
 |:----------------|:--------------------------------------------------
 | Homepage        | https://github.com/pry/pry-developer_tools
 | Documentation   | http://github.com/pry/pry-developer_tools/
