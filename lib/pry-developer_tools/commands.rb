@@ -1,19 +1,29 @@
 module PryDeveloperTools
 
   Commands = Pry::CommandSet.new do
-    command "define-command", "Define a command in the session, use same syntax as `command` method for command API" do |arg|
-      if arg.nil?
-        raise Pry::CommandError, "Provide an arg!"
-      end
-
-      prime_string = "command #{arg_string}\n"
-      command_string = _pry_.r(target, prime_string)
-
-      eval_string.replace <<-HERE
-        _pry_.commands.instance_eval do
-          #{command_string}
+    command_class "define-command", "Define a Pry command for this session." do
+      banner <<-BANNER
+        Usage: define-command "name", "my description" do
+          p "I do something"
         end
-      HERE
+
+        Define a Pry command.
+      BANNER
+
+      def process
+        if args.empty?
+          raise Pry::CommandError, "Provide an arg!"
+        end
+
+        prime_string = "command #{arg_string}\n"
+        command_string = _pry_.r(target, prime_string)
+
+        eval_string.replace <<-HERE
+          _pry_.commands.instance_eval do
+            #{command_string}
+          end
+        HERE
+      end
     end
 
     command_class "reload-command", "Reload a Pry command." do
