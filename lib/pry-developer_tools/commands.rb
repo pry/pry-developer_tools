@@ -3,7 +3,7 @@ module PryDeveloperTools
   Commands = Pry::CommandSet.new do
     command "define-command", "Define a command in the session, use same syntax as `command` method for command API" do |arg|
       if arg.nil?
-        raise CommandError, "Provide an arg!"
+        raise Pry::CommandError, "Provide an arg!"
       end
 
       prime_string = "command #{arg_string}\n"
