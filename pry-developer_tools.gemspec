@@ -18,6 +18,6 @@ Gem::Specification.new do |s|
   s.rubyforge_project = '[none]'
   s.required_rubygems_version = '>= 1.3.6'
 
-  s.add_runtime_dependency      'pry', '~> 0.9.8.pre'
+  s.add_runtime_dependency 'pry', '~> 0.9.8.pre'
   s.add_development_dependency 'rake'     , '~> 0.9.2'
 end
