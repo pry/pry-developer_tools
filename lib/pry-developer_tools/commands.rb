@@ -66,12 +66,7 @@ module PryDeveloperTools
           raise Pry::CommandError, "No command given."
         end
 
-        @command = find_command
-        @file, @lineno = find_file_and_lineno
-
-        if @command.nil?
-          raise Pry::CommandError, 'No command found.'
-        end
+        @command, @_target = find_command_and_target
 
         case
         when opts.present?(:patch)
@@ -81,32 +76,56 @@ module PryDeveloperTools
         end
       end
 
+      def find_command_and_target
+        raw = args.first
+
+        if raw.include?('#')
+          command, method = raw.split('#', 2)
+          command = _pry_.commands.find_command(command)
+          target  = command.instance_method(method) rescue nil
+        else
+          command = _pry_.commands.find_command(raw)
+          target  = command.block rescue nil
+        end
+
+        if command.nil?
+          raise Pry::CommandError, "No command found."
+        end
+
+        if target.nil?
+          raise Pry::CommandError, "Method '#{method}' could not be found."
+        end
+
+        [command, target]
+      end
+
       def edit_permanently
-        invoke_editor(@file, @lineno)
+        file, lineno = @_target.source_location
+        invoke_editor(file, lineno)
 
         command_set = silence_warnings do
-          eval File.read(@file), TOPLEVEL_BINDING, @file, 1
+          eval File.read(file), TOPLEVEL_BINDING, file, 1
         end
 
         unless command_set.is_a?(Pry::CommandSet)
           raise Pry::CommandError,
-                "Expected file '#{@file}' to return a CommandSet"
+                "Expected file '#{file}' to return a CommandSet"
         end
 
         _pry_.commands.delete(@command.name)
         _pry_.commands.import(command_set)
-        set_file_and_dir_locals(@file)
+        set_file_and_dir_locals(file)
       end
 
       def edit_temporarily
-        source_code = Pry::Method(@command.block).source
+        source_code = Pry::Method(@_target).source
         modified_code = nil
 
         temp_file do |f|
           f.write(source_code)
           f.flush
 
-          invoke_editor(f.path, @lineno)
+          invoke_editor(f.path, 1)
           modified_code = File.read(f.path)
         end
 
@@ -120,44 +139,6 @@ module PryDeveloperTools
         _pry_.commands.delete(@command.name)
         _pry_.commands.import(command_set)
       end
-
-      def find_command
-        raw = args.first
-
-        if raw.include?('#')
-          command, _ = raw.split('#', 2)
-          command = _pry_.commands.find_command(command)
-        else
-          command = _pry_.commands.find_command(raw)
-        end
-
-        command
-      end
-      private :find_command
-
-      def find_file_and_lineno
-        raw = args.first
-
-        if raw.include?('#')
-          _, method = raw.split('#', 2)
-          method = @command.instance_method(method) rescue nil
-
-          if method.nil?
-            raise Pry::CommandError, "Method '#{method}' not found."
-          end
-
-          if opts.present?(:p)
-            raise Pry::CommandError,
-            "edit-command -p cannot edit by method name"
-          end
-
-          method.source_location
-        else
-          @command.block.source_location
-        end
-      end
-      private :find_file_and_lineno
-
     end
   end
 
