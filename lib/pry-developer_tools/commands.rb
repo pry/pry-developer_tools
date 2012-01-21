@@ -84,7 +84,7 @@ module PryDeveloperTools
           command = _pry_.commands.find_command(command)
           target  = command.instance_method(method) rescue nil
         else
-          command = _pry_.commands.find_command(str)
+          command = _pry_.commands.find_command(raw)
           target  = command.block rescue nil
         end
 
@@ -129,7 +129,7 @@ module PryDeveloperTools
           modified_code = File.read(f.path)
         end
 
-        command_set = CommandSet.new do
+        command_set = Pry::CommandSet.new do
           silence_warnings do
             pry = Pry.new :input => StringIO.new(modified_code)
             pry.rep(binding)
