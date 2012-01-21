@@ -62,11 +62,11 @@ module PryDeveloperTools
       end
 
       def process
-        @command, @_target = find_command_and_target
-
-        if @command.nil?
-          raise Pry::CommandError, 'Command not found.'
+        if args.empty?
+          raise Pry::CommandError, "No command given."
         end
+
+        @command, @_target = find_command_and_target
 
         case
         when opts.present?(:patch)
@@ -82,10 +82,18 @@ module PryDeveloperTools
         if raw.include?('#')
           command, method = raw.split('#', 2)
           command = _pry_.commands.find_command(command)
-          target  = command.instance_method(method)
+          target  = command.instance_method(method) rescue nil
         else
           command = _pry_.commands.find_command(str)
-          target  = command.block
+          target  = command.block rescue nil
+        end
+
+        if command.nil?
+          raise Pry::CommandError, "No command found."
+        end
+
+        if target.nil?
+          raise Pry::CommandError, "Method '#{method}' could not be found."
         end
 
         [command, target]
