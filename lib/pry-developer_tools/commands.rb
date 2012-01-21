@@ -62,7 +62,7 @@ module PryDeveloperTools
       end
 
       def process
-        @command = _pry_.commands.find_command(args.first)
+        @command, @_target = find_command_and_target
 
         if @command.nil?
           raise Pry::CommandError, 'Command not found.'
@@ -76,8 +76,23 @@ module PryDeveloperTools
         end
       end
 
+      def find_command_and_target
+        raw = args.first
+
+        if raw.include?('#')
+          command, method = raw.split('#', 2)
+          command = _pry_.commands.find_command(command)
+          target  = command.instance_method(method)
+        else
+          command = _pry_.commands.find_command(str)
+          target  = command.block
+        end
+
+        [command, target]
+      end
+
       def edit_permanently
-        file, lineno = @command.block.source_location
+        file, lineno = @_target.source_location
         invoke_editor(file, lineno)
 
         command_set = silence_warnings do
@@ -95,7 +110,7 @@ module PryDeveloperTools
       end
 
       def edit_temporarily
-        source_code = Pry::Method(@command.block).source
+        source_code = Pry::Method(@_target).source
         modified_code = nil
 
         temp_file do |f|
