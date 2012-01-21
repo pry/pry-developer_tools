@@ -57,18 +57,12 @@ module PryDeveloperTools
         Edit a Pry command.
       BANNER
 
-      def initialize env
-        @pry = env[:pry_instance]
-        @command = nil
-        super(env)
-      end
-
       def options(opt)
         opt.on :p, :patch, 'Perform a in-memory edit of a command'
       end
 
       def process
-        @command = @pry.commands.find_command(args.first)
+        @command = _pry_.commands.find_command(args.first)
 
         if @command.nil?
           raise Pry::CommandError, 'Command not found.'
@@ -95,8 +89,8 @@ module PryDeveloperTools
                 "Expected file '#{file}' to return a CommandSet"
         end
 
-        @pry.commands.delete(@command.name)
-        @pry.commands.import(command_set)
+        _pry_.commands.delete(@command.name)
+        _pry_.commands.import(command_set)
         set_file_and_dir_locals(file)
       end
 
@@ -119,8 +113,8 @@ module PryDeveloperTools
           end
         end
 
-        @pry.commands.delete(@command.name)
-        @pry.commands.import(command_set)
+        _pry_.commands.delete(@command.name)
+        _pry_.commands.import(command_set)
       end
     end
   end
