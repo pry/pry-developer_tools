@@ -1,7 +1,7 @@
 module PryDeveloperTools
 
   Commands = Pry::CommandSet.new do
-    command_class "define-command", "Define a Pry command for this session." do
+    create_command "define-command", "Define a Pry command for this session." do
       banner <<-BANNER
         Usage: define-command "name", "my description" do
           p "I do something"
@@ -26,7 +26,7 @@ module PryDeveloperTools
       end
     end
 
-    command_class "reload-command", "Reload a Pry command." do
+    create_command "reload-command", "Reload a Pry command." do
       banner <<-BANNER
         Usage: reload-command command
         Reload a Pry command.
@@ -51,7 +51,7 @@ module PryDeveloperTools
       end
     end
 
-    command_class "edit-command", "Edit a Pry command." do
+    create_command "edit-command", "Edit a Pry command." do
       banner <<-BANNER
         Usage: edit-command [options] command
         Edit a Pry command.
