@@ -101,7 +101,7 @@ module PryDeveloperTools
 
       def edit_permanently
         file, lineno = @_target.source_location
-        invoke_editor(file, lineno)
+        invoke_editor(file, lineno, true)
 
         command_set = silence_warnings do
           eval File.read(file), TOPLEVEL_BINDING, file, 1
@@ -125,7 +125,7 @@ module PryDeveloperTools
           f.write(source_code)
           f.flush
 
-          invoke_editor(f.path, 1)
+          invoke_editor(f.path, 1, true)
           modified_code = File.read(f.path)
         end
 
